@@ -24,7 +24,30 @@
     <!-- Header Navigation -->
     <nav class="navbar navbar-expand-lg navbar-light bg-light">
       <div class="container-fluid">
-        <a class="navbar-brand" href="#">NoteTakingApp</a>
+        <a class="navbar-brand" href="#">
+          <svg
+            width="1.5em"
+            height="1em"
+            viewBox="0 0 16 16"
+            class="bi bi-card-heading"
+            fill="currentColor"
+            xmlns="http://www.w3.org/2000/svg"
+            style="font-size: 24px;"
+          >
+            <path
+              fill-rule="evenodd"
+              d="M14.5 3h-13a.5.5 0 0 0-.5.5v9a.5.5 0 0 0 .5.5h13a.5.5 0 0 0 .5-.5v-9a.5.5 0 0 0-.5-.5zm-13-1A1.5 1.5 0 0 0 0 3.5v9A1.5 1.5 0 0 0 1.5 14h13a1.5 1.5 0 0 0 1.5-1.5v-9A1.5 1.5 0 0 0 14.5 2h-13z"
+            />
+            <path
+              fill-rule="evenodd"
+              d="M3 8.5a.5.5 0 0 1 .5-.5h9a.5.5 0 0 1 0 1h-9a.5.5 0 0 1-.5-.5zm0 2a.5.5 0 0 1 .5-.5h6a.5.5 0 0 1 0 1h-6a.5.5 0 0 1-.5-.5z"
+            />
+            <path
+              d="M3 5.5a.5.5 0 0 1 .5-.5h9a.5.5 0 0 1 .5.5v1a.5.5 0 0 1-.5.5h-9a.5.5 0 0 1-.5-.5v-1z"
+            />
+          </svg>
+          Notes!
+        </a>
         <button
           class="navbar-toggler"
           type="button"
@@ -55,7 +78,11 @@
         </div>
       </div>
     </nav>
-    {% block body %}{% endblock %}
+    {% if message %}
+    <div class="alert alert-danger">
+      {{ message }}
+    </div>
+    {% endif %} {% block body %}{% endblock %}
 
     <!-- Login Or SignUp Forms -->
     <section id="auth-form" style="display: none;">
@@ -94,7 +121,7 @@
           <h2 class="mb-3 text-center">
             Sign<span class="text-primary">In</span>
           </h2>
-          <form action="">
+          <form action="/signin" method="POST">
             <div class="mb-3">
               <input
                 type="email"
@@ -120,6 +147,7 @@
             <button
               type="submit"
               class="btn btn-outline-primary bg-gradient mb-3"
+              onclick="disableButton(this)"
             >
               Login
             </button>
@@ -135,7 +163,7 @@
           <h2 class="mb-3 text-center">
             Sign<span class="text-primary">Up</span>
           </h2>
-          <form action="">
+          <form action="/signup" method="POST">
             <div class="mb-3">
               <input
                 type="text"

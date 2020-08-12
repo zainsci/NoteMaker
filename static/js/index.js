@@ -1,3 +1,4 @@
+// Showing And Hiding SignIn SignUp Form
 function showForm(name) {
   if (name === "signInForm") {
     document.getElementById("auth-form").style.display = "flex";
@@ -15,3 +16,8 @@ document.getElementById("cross").onclick = () => {
   document.getElementById("signInForm").style.display = "none";
   document.getElementById("signUpForm").style.display = "none";
 };
+
+// For Disabling Buttons
+function disableButton(btn) {
+  btn.classList.add = "disabaled";
+}

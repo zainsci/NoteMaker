@@ -1,3 +1,33 @@
+// Landing Page
+.index-page {
+  main {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    overflow: hidden;
+    height: calc(100vh - 56px);
+    width: 100vw;
+    .index-left {
+      padding: 100px;
+      width: 50vw;
+      height: 100%;
+      h1 {
+        font-weight: 900;
+      }
+    }
+    .index-right {
+      overflow: hidden;
+      height: 100%;
+      width: 50vw;
+      img {
+        width: 100%;
+        height: 100%;
+        object-fit: cover;
+        object-position: right;
+      }
+    }
+  }
+}
+
 .sidebar {
   width: 60px;
   height: calc(100vh - 56px);
@@ -18,7 +48,7 @@
   }
 }
 
-section {
+#auth-form {
   position: absolute;
   width: 100vw;
   height: 100vh;
