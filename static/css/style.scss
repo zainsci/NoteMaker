@@ -1,3 +1,32 @@
+$satisfy-font: "Satisfy", cursive;
+
+.brand-name {
+  font-family: $satisfy-font;
+}
+
+// Navbar Custom Styles
+nav {
+  .container-fluid {
+    .brand-name {
+      line-height: 1;
+      margin: 0 20px 0 0;
+      padding: 5 0 0 0;
+      font-size: 28px;
+    }
+    #navbarNav {
+      width: auto;
+    }
+  }
+}
+@media (max-width: 992px) {
+  nav {
+    .container-fluid {
+      #navbarNav {
+        width: 100% !important;
+      }
+    }
+  }
+}
 // Landing Page
 .index-page {
   main {
@@ -8,8 +37,13 @@
     width: 100vw;
     .index-left {
       padding: 100px;
-      width: 50vw;
+      width: 40vw;
       height: 100%;
+      .brand-name {
+        font-size: 24px;
+        margin: 0;
+        padding: 0;
+      }
       h1 {
         font-weight: 900;
       }
@@ -17,7 +51,7 @@
     .index-right {
       overflow: hidden;
       height: 100%;
-      width: 50vw;
+      width: 60vw;
       img {
         width: 100%;
         height: 100%;
@@ -103,13 +137,7 @@
       width: 400px;
       padding: 20px;
       border-radius: 4px;
-      form {
-        input {
-        }
-        button {
-          width: 100%;
-        }
-      }
+      opacity: 1;
     }
   }
 }
