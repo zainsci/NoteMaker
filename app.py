@@ -110,13 +110,26 @@ def signup():
         return redirect("index")
 
 
-@app.route("/fetchnotes")
-def fetch_notes():
-    if request.method == "POST":
-        notes = db.query(Note).all()
-        return jsonify({"notes": notes})
+@app.route("/all_notes")
+def all_notes():
+    user = db.query(User).filter_by(username=session['username']).first()
+
+    notes = db.query(Note).filter_by(user_id=user.id).all()
+    notes = {"notes": notes}
+    return jsonify(notes)
+
+
+@app.route("/note/<int:note_id>")
+def note(note_id):
+    note = db.query(Note).filter_by(id=note_id).first()
+    user = db.query(User).filter_by(username=session['username']).first()
+    if note:
+        if note.user_id == user.id:
+            return jsonify({"note": note})
+        else:
+            return jsonify({"error": 404})
     else:
-        pass
+        return jsonify({"error": 404})
 
 
 @app.route("/logout")
