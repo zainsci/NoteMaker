@@ -17,7 +17,11 @@ app.config["SESSION_TYPE"] = "filesystem"
 @app.route("/")
 def index():
     if session.get("username"):
-        return render_template("dashboard.html")
+        user = db.query(User).filter_by(username=session['username']).first()
+        notes = db.query(Note).filter_by(user_id=user.id).all()
+
+        notes = reversed(list(notes))
+        return render_template("dashboard.html", notes=notes)
     return render_template("index.html")
 
 
@@ -123,7 +127,15 @@ def make_note():
     newNote.user_id = user.id
     db.add(newNote)
     db.commit()
-    return jsonify({"status": 200, "message": "Note Added Successfully."})
+
+    data = {
+        "success": True,
+        "title": newNote.title,
+        "content": newNote.content,
+        "timestamp": newNote.timestamp.strftime("%d %b %Y %I:%M:%S %p"),
+        "id": newNote.id
+    }
+    return jsonify(data)
 
 
 @app.route("/all_notes")
@@ -135,13 +147,21 @@ def all_notes():
     return jsonify(notes)
 
 
-@app.route("/note/<int:note_id>")
+# API for Single Note For Display Route
+@app.route("/note/<int:note_id>", methods=["GET", "POST"])
 def note(note_id):
+    # Querying Database for User And Note with ID
     note = db.query(Note).filter_by(id=note_id).first()
     user = db.query(User).filter_by(username=session['username']).first()
+    # Checking If Note Belogns To The Person Logged IN
     if note:
         if note.user_id == user.id:
-            return jsonify({"note": note})
+            note = {
+                "title": note.title,
+                "content": note.content,
+                "timestamp": note.timestamp.strftime("%d %b %Y %I:%M:%S %p")
+            }
+            return jsonify(note)
         else:
             return jsonify({"error": 404})
     else:

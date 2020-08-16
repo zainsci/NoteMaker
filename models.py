@@ -3,7 +3,9 @@ from sqlalchemy.orm import sessionmaker, relationship
 from sqlalchemy.ext.declarative import declarative_base
 from sqlalchemy.sql.sqltypes import TIMESTAMP
 
-engine = create_engine("sqlite:///test.db", echo=True, pool_pre_ping=True)
+engine = create_engine("sqlite:///test.db",
+                       echo=True,
+                       connect_args={'check_same_thread': False})
 Base = declarative_base()
 Base.metadata.bind = engine
 

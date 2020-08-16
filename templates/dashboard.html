@@ -45,56 +45,20 @@
       </div>
       <div class="user-notes col-3">
         <div class="notes-list">
+          {% for note in notes %}
           <div class="card border-secondary mb-3" style="max-width: 18rem;">
-            <div class="card-header">Note Title</div>
+            <div class="card-header">{{note.title}}</div>
             <div class="card-body text-secondary">
               <p class="card-text">
-                Some quick example text to build on the card title and make up
-                the bulk of the card's content.
-                <a href="#" class="stretched-link"></a>
+                {{note.content[:60] + "..."}}
+                <a
+                  href="javascript:showNote({{note.id}})"
+                  class="stretched-link"
+                ></a>
               </p>
             </div>
           </div>
-          <div class="card border-secondary mb-3" style="max-width: 18rem;">
-            <div class="card-header">Note Title</div>
-            <div class="card-body text-secondary">
-              <p class="card-text">
-                Some quick example text to build on the card title and make up
-                the bulk of the card's content.
-                <a href="#" class="stretched-link"></a>
-              </p>
-            </div>
-          </div>
-          <div class="card border-secondary mb-3" style="max-width: 18rem;">
-            <div class="card-header">Note Title</div>
-            <div class="card-body text-secondary">
-              <p class="card-text">
-                Some quick example text to build on the card title and make up
-                the bulk of the card's content.
-                <a href="#" class="stretched-link"></a>
-              </p>
-            </div>
-          </div>
-          <div class="card border-secondary mb-3" style="max-width: 18rem;">
-            <div class="card-header">Note Title</div>
-            <div class="card-body text-secondary">
-              <p class="card-text">
-                Some quick example text to build on the card title and make up
-                the bulk of the card's content.
-                <a href="#" class="stretched-link"></a>
-              </p>
-            </div>
-          </div>
-          <div class="card border-secondary mb-3" style="max-width: 18rem;">
-            <div class="card-header">Note Title</div>
-            <div class="card-body text-secondary">
-              <p class="card-text">
-                Some quick example text to build on the card title and make up
-                the bulk of the card's content.
-                <a href="#" class="stretched-link"></a>
-              </p>
-            </div>
-          </div>
+          {% endfor %}
         </div>
       </div>
       <div class="note col-7">

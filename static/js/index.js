@@ -48,24 +48,89 @@ document.getElementById("createNote").onclick = () => {
 
   // Creating EventListener to Button For Submission
   document.getElementById("createNoteSave").onclick = () => {
-    const title = document.getElementById("createNoteTitle");
-    const content = document.getElementById("createNoteContent");
-
     const request = new XMLHttpRequest();
-    const formData = new FormData();
+    let title = document.getElementById("createNoteTitle").value;
+    let content = document.getElementById("createNoteContent").value;
 
-    formData.append("title", title.value);
-    formData.append("content", content.value);
+    if (title == "" || content == "") {
+      alert("Please Enter Both Title And Note Content");
+    }
 
     request.open("POST", "/make_note");
-    request.send(formData);
 
-    request.onload = (data) => {
-      console.log(data.target.response.status);
-      console.log(data.target.responseText.data);
+    request.onload = () => {
+      const data = JSON.parse(request.responseText);
+
+      if (data.success) {
+        const noteDisplay = document.getElementById("noteDisplay");
+        noteDisplay.innerHTML = "";
+
+        const h1 = document.createElement("h1");
+        h1.innerHTML = data.title;
+        const small = document.createElement("small");
+        small.innerHTML = data.timestamp;
+        small.style.color = "#aaa";
+        const p = document.createElement("p");
+        p.innerHTML = data.content;
+
+        noteDisplay.appendChild(h1);
+        noteDisplay.appendChild(small);
+        noteDisplay.appendChild(p);
+
+        // Displaying in Notes List
+        const noteList = document.querySelector(".notes-list");
+        const div = document.createElement("div");
+        div.classList = "card border-secondary mb-3";
+        div.style.maxWidth = "18rem";
+        let newNote = `
+            <div class="card-header">${data.title}</div>
+            <div class="card-body text-secondary">
+              <p class="card-text">
+                ${data.content.slice(0, 60) + "..."}
+                <a
+                  href="javascript:showNote(${data.id})"
+                  class="stretched-link"
+                ></a>
+              </p>
+            </div>
+        `;
+        div.innerHTML = newNote;
+        noteList.prepend(div);
+        // const preNotes = noteList.innerHTML;
+        // noteList.innerHTML = "";
+        // noteList.appendChild(newNote);
+        // noteList.appendChild(preNotes);
+      }
     };
+
+    const formData = new FormData();
+    formData.append("title", title);
+    formData.append("content", content);
+
+    request.send(formData);
+    return false;
   };
 };
+
+// For Displaying Note
+function showNote(id) {
+  fetch(`/note/${id}`)
+    .then((response) => response.json())
+    .then((data) => {
+      document.getElementById("noteDisplay").innerHTML = "";
+      const h1 = document.createElement("h1");
+      h1.innerHTML = data.title;
+      const small = document.createElement("small");
+      small.innerHTML = data.timestamp;
+      small.style.color = "#aaa";
+      const p = document.createElement("p");
+      p.innerHTML = data.content;
+
+      document.getElementById("noteDisplay").appendChild(h1);
+      document.getElementById("noteDisplay").appendChild(small);
+      document.getElementById("noteDisplay").appendChild(p);
+    });
+}
 
 // For Disabling Buttons
 function disableButton(btn) {
