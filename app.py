@@ -1,7 +1,9 @@
 from flask import Flask, render_template, url_for, request, redirect, jsonify, session, flash
+from flask import json
 from models import Session, db, User, Note
 import os
 import hashlib
+from datetime import datetime
 
 app = Flask(__name__)
 app.secret_key = b'\xd9|\x1b8\x13r\x95\x97\xee\x17"`\x8cdHh'
@@ -108,6 +110,20 @@ def signup():
                 return redirect(url_for("index"))
     else:
         return redirect("index")
+
+
+@app.route("/make_note", methods=["POST"])
+def make_note():
+    user = db.query(User).filter_by(username=session['username']).first()
+
+    newNote = Note()
+    newNote.title = request.form["title"]
+    newNote.content = request.form["content"]
+    newNote.timestamp = datetime.now()
+    newNote.user_id = user.id
+    db.add(newNote)
+    db.commit()
+    return jsonify({"status": 200, "message": "Note Added Successfully."})
 
 
 @app.route("/all_notes")

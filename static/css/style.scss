@@ -161,8 +161,12 @@ nav {
             color: #eee;
           }
         }
+        input {
+          width: 100%;
+          border-color: #eee;
+        }
         textarea {
-          height: 460px;
+          height: 360px;
           border-color: #eee;
         }
       }
