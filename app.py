@@ -17,8 +17,7 @@ app.config["SESSION_TYPE"] = "filesystem"
 @app.route("/")
 def index():
     if session.get("username"):
-        user = db.query(User).filter_by(username=session['username']).first()
-        notes = db.query(Note).filter_by(user_id=user.id).all()
+        notes = db.query(Note).filter_by(user_id=session["user_id"]).all()
 
         notes = reversed(list(notes))
         return render_template("dashboard.html", notes=notes)
@@ -56,7 +55,8 @@ def signin():
 
             # matching password from databse and the user entered
             if hash == user.hash:
-                session['username'] = username
+                session['username'] = user.username
+                session['user_id'] = user.id
                 return redirect(url_for('index'))
             # if incorrect password
             else:
@@ -109,7 +109,8 @@ def signup():
                 db.add(user)
                 db.commit()
                 # creating user session and logging in
-                session['username'] = username
+                session['username'] = user.username
+                session['user_id'] = user.id
                 flash(f"Account Created With Username {username}")
                 return redirect(url_for("index"))
     else:
@@ -118,13 +119,12 @@ def signup():
 
 @app.route("/make_note", methods=["POST"])
 def make_note():
-    user = db.query(User).filter_by(username=session['username']).first()
-
     newNote = Note()
     newNote.title = request.form["title"]
     newNote.content = request.form["content"]
+    newNote.tag = request.form["tag"]
     newNote.timestamp = datetime.now()
-    newNote.user_id = user.id
+    newNote.user_id = session["user_id"]
     db.add(newNote)
     db.commit()
 
@@ -132,6 +132,7 @@ def make_note():
         "success": True,
         "title": newNote.title,
         "content": newNote.content,
+        "tag": newNote.tag,
         "timestamp": newNote.timestamp.strftime("%d %b %Y %I:%M:%S %p"),
         "id": newNote.id
     }
@@ -140,11 +141,20 @@ def make_note():
 
 @app.route("/all_notes")
 def all_notes():
-    user = db.query(User).filter_by(username=session['username']).first()
+    db_data = db.query(Note).filter_by(user_id=session["user_id"]).all()
+    notes = []
+    for data in db_data:
+        note = {
+            "success": True,
+            "title": data.title,
+            "content": data.content,
+            "timestamp": data.timestamp.strftime("%d %b %Y %I:%M:%S %p"),
+            "id": data.id
+        }
+        notes.append(note)
+    data = notes[::-1]
 
-    notes = db.query(Note).filter_by(user_id=user.id).all()
-    notes = {"notes": notes}
-    return jsonify(notes)
+    return jsonify(data)
 
 
 # API for Single Note For Display Route
@@ -152,20 +162,39 @@ def all_notes():
 def note(note_id):
     # Querying Database for User And Note with ID
     note = db.query(Note).filter_by(id=note_id).first()
-    user = db.query(User).filter_by(username=session['username']).first()
     # Checking If Note Belogns To The Person Logged IN
     if note:
-        if note.user_id == user.id:
+        if note.user_id == session["user_id"]:
             note = {
                 "title": note.title,
                 "content": note.content,
-                "timestamp": note.timestamp.strftime("%d %b %Y %I:%M:%S %p")
+                "timestamp": note.timestamp.strftime("%d %b %Y %I:%M:%S %p"),
+                "tag": note.tag
             }
             return jsonify(note)
         else:
             return jsonify({"error": 404})
     else:
         return jsonify({"error": 404})
+
+
+# For Notes Related To One Tag
+@app.route("/notes/<string:tag>")
+def notes_tag(tag):
+    dbData = db.query(Note).filter_by(tag=tag[3:]).all()
+    notes = []
+    for data in dbData:
+        note = {
+            "success": True,
+            "title": data.title,
+            "content": data.content,
+            "timestamp": data.timestamp.strftime("%d %b %Y %I:%M:%S %p"),
+            "id": data.id
+        }
+        notes.append(note)
+    data = notes[::-1]
+
+    return jsonify(data)
 
 
 @app.route("/logout")

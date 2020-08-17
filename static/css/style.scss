@@ -140,7 +140,7 @@ nav {
     }
     .user-notes {
       height: 100%;
-      .notes-list {
+      #notesList {
         height: 100%;
         padding: 40px 0;
         overflow-y: scroll;
@@ -162,8 +162,14 @@ nav {
           }
         }
         input {
-          width: 100%;
+          width: 60%;
           border-color: #eee;
+          display: inline;
+        }
+        select {
+          width: 38%;
+          border-color: #eee;
+          display: inline;
         }
         textarea {
           height: 360px;

@@ -32,8 +32,9 @@ class Note(Base):
 
     id = Column(Integer, primary_key=True)
     user_id = Column(Integer, ForeignKey("users.id"))
-    title = Column(String)
+    title = Column(String(200))
     content = Column(String)
+    tag = Column(String(40))
     timestamp = Column(TIMESTAMP)
 
     users = relationship("User", back_populates="notes")
@@ -41,3 +42,7 @@ class Note(Base):
     def __repr__(self):
         return "<Note(user_id='%s', content='%s')>" % (self.user_id,
                                                        self.content)
+
+
+if __name__ == "__main__":
+    Base.metadata.create_all(engine)
