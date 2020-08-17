@@ -30,6 +30,7 @@ document.getElementById("createNote").onclick = () => {
   input.id = "createNoteTitle";
   input.classList = "form-control mb-1";
   input.placeholder = "Note title here...";
+  input.maxLength = 60;
   // Creating Content Textarea
   const textarea = document.createElement("textarea");
   textarea.id = "createNoteContent";
@@ -83,7 +84,7 @@ document.getElementById("createNote").onclick = () => {
         div.classList = "card border-secondary mb-3";
         div.style.maxWidth = "18rem";
         let newNote = `
-            <div class="card-header">${data.title}</div>
+            <div class="card-header">${data.title.slice(0, 30) + "..."}</div>
             <div class="card-body text-secondary">
               <p class="card-text">
                 ${data.content.slice(0, 60) + "..."}
@@ -96,10 +97,6 @@ document.getElementById("createNote").onclick = () => {
         `;
         div.innerHTML = newNote;
         noteList.prepend(div);
-        // const preNotes = noteList.innerHTML;
-        // noteList.innerHTML = "";
-        // noteList.appendChild(newNote);
-        // noteList.appendChild(preNotes);
       }
     };
 
@@ -134,5 +131,9 @@ function showNote(id) {
 
 // For Disabling Buttons
 function disableButton(btn) {
-  btn.classList.add = "disabaled";
+  const loading = document.createElement("span");
+  loading.classList = "spinner-border spinner-border-sm";
+  loading.role = "status";
+  btn.innerHTML = "";
+  btn.appendChild(btn);
 }

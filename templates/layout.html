@@ -33,10 +33,10 @@
             <a class="nav-link active" aria-current="page" href="/">Home</a>
           </li>
           <li class="nav-item">
-            <a class="nav-link" href="javascript:showForm('signInForm')">LogIn</a>
+            <a class="nav-link" href="javascript:showForm('signInForm')">Signin</a>
           </li>
           <li class="nav-item">
-            <a class="nav-link" href="javascript:showForm('signUpForm')">SignUp</a>
+            <a class="nav-link" href="javascript:showForm('signUpForm')">Signup</a>
           </li>
           {% else %}
           <li class="nav-item">
@@ -54,7 +54,12 @@
   <div class="alert alert-danger text-center">
     {% for message in messages %} {{ message }} {% endfor %}
   </div>
-  {% endif %} {% endwith %} {% block body %}{% endblock %}
+  {% endif %} {% endwith %}
+  <div class="progress" style="height: 1px;">
+    <div class="progress-bar" role="progressbar" style="width: 50%;" aria-valuenow="50" aria-valuemin="0"
+      aria-valuemax="100"></div>
+  </div>
+  {% block body %}{% endblock %}
 
   <!-- Login Or SignUp Forms -->
   <section id="auth-form" style="display: none;">
@@ -79,14 +84,16 @@
         </h2>
         <form action="/signup" method="POST">
           <div class="mb-3">
-            <input type="text" name="username" id="signupUsername" class="form-control" autocomplete="off"
+            <input type="text" name="signupUsername" id="signupUsername" class="form-control" autocomplete="off"
               placeholder="Username" />
           </div>
           <div class="mb-3">
-            <input type="email" name="email" id="email" class="form-control" autocomplete="off" placeholder="Email" />
+            <input type="email" name="signupEmail" id="signupEmail" class="form-control" autocomplete="off"
+              placeholder="Email" />
           </div>
           <div class="mb-3">
-            <input type="password" name="password" id="signupPassword" class="form-control" placeholder="Password" />
+            <input type="password" name="signupPassword" id="signupPassword" class="form-control"
+              placeholder="Password" />
           </div>
           <div class="mb-3">
             <input type="password" name="conf-password" id="conf-password" class="form-control" autocomplete="off"
@@ -99,17 +106,18 @@
                 href="javascript:showForm('signInForm')">SIGNIN</a></span></small>
         </form>
       </div>
-      <div class="login" style="display: none;" id="signInForm">
+      <div class="signin" style="display: none;" id="signInForm">
         <h2 class="mb-3 text-center">
           Sign<span class="text-primary">In</span>
         </h2>
         <form action="/signin" method="POST">
           <div class="mb-3">
-            <input type="text" name="signinUsername" id="username" class="form-control" autocomplete="off"
+            <input type="text" name="signinUsername" id="signinUsername" class="form-control" autocomplete="off"
               placeholder="Username" />
           </div>
           <div class="mb-3">
-            <input type="password" name="password" id="signinPassword" class="form-control" placeholder="Password" />
+            <input type="password" name="signinPassword" id="signinPassword" class="form-control"
+              placeholder="Password" />
           </div>
           <button type="submit" class="btn btn-outline-primary bg-gradient mb-3 btn-block">
             Login

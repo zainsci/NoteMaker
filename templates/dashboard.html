@@ -47,14 +47,11 @@
         <div class="notes-list">
           {% for note in notes %}
           <div class="card border-secondary mb-3" style="max-width: 18rem;">
-            <div class="card-header">{{note.title}}</div>
+            <div class="card-header">{{note.title[:30] + "..."}}</div>
             <div class="card-body text-secondary">
               <p class="card-text">
                 {{note.content[:60] + "..."}}
-                <a
-                  href="javascript:showNote({{note.id}})"
-                  class="stretched-link"
-                ></a>
+                <a href="javascript:showNote({{note.id}})" class="stretched-link"></a>
               </p>
             </div>
           </div>

@@ -33,8 +33,8 @@ def signin():
 
     # If User tries to signin
     if request.method == "POST":
-        username = request.form['username']
-        password = request.form['password']
+        username = request.form['signinUsername']
+        password = request.form['signinPassword']
 
         # If Username is not provided
         if not username:
@@ -78,9 +78,9 @@ def signup():
     # if user tries to signup
     if request.method == "POST":
         # getting username and other
-        username = request.form['username']
-        email = request.form['email']
-        password = request.form['password']
+        username = request.form['signupUsername']
+        email = request.form['signupEmail']
+        password = request.form['signupPassword']
         conf_password = request.form['conf-password']
 
         # if username is not provided

@@ -33,7 +33,7 @@ nav {
     display: grid;
     grid-template-columns: 1fr 1fr;
     overflow: hidden;
-    height: calc(100vh - 56px);
+    height: calc(100vh - 60px);
     width: 100vw;
     .index-left {
       padding: 100px;
@@ -108,7 +108,7 @@ nav {
       right: 20px;
       cursor: pointer;
     }
-    .login,
+    .signin,
     .signup {
       margin-left: 50px;
       position: absolute;
