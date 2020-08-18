@@ -129,6 +129,13 @@
             </div>
           </div>
         </div>
+        <div class="mt-auto">
+          <div class="create-btn">
+            <div class="btn btn-info" style="width: 100%;" id="createEditor">
+              Editor
+            </div>
+          </div>
+        </div>
       </div>
       <div class="user-notes col-3">
         <div id="notesList">
@@ -141,18 +148,22 @@
             data-autohide="false"
           >
             <div class="toast-header">
-              <strong class="mr-auto">{{note.title[:20] + "..."}}</strong>
+              <strong class="mr-auto"
+                >{{note.title[:20] + "..." | safe}}</strong
+              >
               <small class="text-muted"
                 >{{note.timestamp.strftime("%d %b %Y %I:%M:%S %p")}}</small
               >
             </div>
             <div class="toast-body">
-              {{note.content[:60] + "..."}}
-              <a
-                href="javascript:showNote({{note.id}})"
-                class="stretched-link"
-              ></a>
+              <div>
+                {{note.content[:60] + "..." }}
+              </div>
             </div>
+            <a
+              href="javascript:showNote({{note.id}})"
+              class="stretched-link"
+            ></a>
           </div>
           {% endfor %}
         </div>

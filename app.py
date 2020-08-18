@@ -1,5 +1,6 @@
 from flask import Flask, render_template, url_for, request, redirect, jsonify, session, flash
-from flask import json
+from jinja2 import utils
+from markupsafe import Markup
 from models import Session, db, User, Note
 import os
 import hashlib
@@ -121,7 +122,7 @@ def signup():
 def make_note():
     newNote = Note()
     newNote.title = request.form["title"]
-    newNote.content = request.form["content"]
+    newNote.content = Markup.escape(request.form["content"])
     newNote.tag = request.form["tag"]
     newNote.timestamp = datetime.now()
     newNote.user_id = session["user_id"]
@@ -131,7 +132,7 @@ def make_note():
     data = {
         "success": True,
         "title": newNote.title,
-        "content": newNote.content,
+        "content": Markup.unescape(newNote.content),
         "tag": newNote.tag,
         "timestamp": newNote.timestamp.strftime("%d %b %Y %I:%M:%S %p"),
         "id": newNote.id
