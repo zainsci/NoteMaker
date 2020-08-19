@@ -1,4 +1,4 @@
-from sqlalchemy import create_engine, Column, Integer, ForeignKey, String
+from sqlalchemy import create_engine, Column, Integer, ForeignKey, String, Boolean
 from sqlalchemy.orm import sessionmaker, relationship
 from sqlalchemy.ext.declarative import declarative_base
 from sqlalchemy.sql.sqltypes import TIMESTAMP
@@ -36,6 +36,7 @@ class Note(Base):
     content = Column(String)
     tag = Column(String(40))
     timestamp = Column(TIMESTAMP)
+    bookmark = Column(Boolean)
 
     users = relationship("User", back_populates="notes")
 

@@ -21,7 +21,7 @@ def index():
         notes = db.query(Note).filter_by(user_id=session["user_id"]).all()
 
         notes = reversed(list(notes))
-        return render_template("dashboard.html", notes=notes, markup=Markup)
+        return render_template("dashboard.html", notes=notes, Markup=Markup)
     return render_template("index.html")
 
 
@@ -132,7 +132,29 @@ def make_note():
     data = {
         "success": True,
         "title": newNote.title,
-        "content": Markup(newNote.content).striptags(),
+        "content": Markup(newNote.content),
+        "tag": newNote.tag,
+        "timestamp": newNote.timestamp.strftime("%d %b %Y %I:%M:%S %p"),
+        "id": newNote.id
+    }
+    return jsonify(data)
+
+
+@app.route("/update_note", methods=["POST"])
+def update_note():
+    newNote = Note()
+    newNote.title = request.form["title"]
+    newNote.content = Markup(request.form["content"])
+    newNote.tag = request.form["tag"]
+    newNote.timestamp = datetime.now()
+    newNote.user_id = session["user_id"]
+    db.add(newNote)
+    db.commit()
+
+    data = {
+        "success": True,
+        "title": newNote.title,
+        "content": Markup(newNote.content),
         "tag": newNote.tag,
         "timestamp": newNote.timestamp.strftime("%d %b %Y %I:%M:%S %p"),
         "id": newNote.id
@@ -167,6 +189,7 @@ def note(note_id):
     if note:
         if note.user_id == session["user_id"]:
             note = {
+                "id": note.id,
                 "title": note.title,
                 "content": note.content,
                 "timestamp": note.timestamp.strftime("%d %b %Y %I:%M:%S %p"),
@@ -196,6 +219,23 @@ def notes_tag(tag):
     data = notes[::-1]
 
     return jsonify(data)
+
+
+# For Deleting Note
+@app.route("/delete/note/<int:id>")
+def delete_note(id):
+    note_to_del = db.query(Note).filter_by(id=id).first()
+    if note_to_del:
+        db.delete(note_to_del)
+
+
+# Bookmark Notes
+@app.route("/note/bookmark/<int:id>")
+def bookmark_note(id):
+    note = db.query(Note).filter_by(id=id).first()
+    note.bookmark = True
+    db.commit()
+    return jsonify({"success": True})
 
 
 @app.route("/logout")
