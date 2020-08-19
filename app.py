@@ -21,7 +21,7 @@ def index():
         notes = db.query(Note).filter_by(user_id=session["user_id"]).all()
 
         notes = reversed(list(notes))
-        return render_template("dashboard.html", notes=notes)
+        return render_template("dashboard.html", notes=notes, markup=Markup)
     return render_template("index.html")
 
 
@@ -122,7 +122,7 @@ def signup():
 def make_note():
     newNote = Note()
     newNote.title = request.form["title"]
-    newNote.content = Markup.escape(request.form["content"])
+    newNote.content = Markup(request.form["content"])
     newNote.tag = request.form["tag"]
     newNote.timestamp = datetime.now()
     newNote.user_id = session["user_id"]
@@ -132,7 +132,7 @@ def make_note():
     data = {
         "success": True,
         "title": newNote.title,
-        "content": Markup.unescape(newNote.content),
+        "content": Markup(newNote.content).striptags(),
         "tag": newNote.tag,
         "timestamp": newNote.timestamp.strftime("%d %b %Y %I:%M:%S %p"),
         "id": newNote.id
