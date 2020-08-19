@@ -171,6 +171,22 @@ nav {
           border-color: #eee;
           display: inline;
         }
+        .menu-buttons {
+          width: 100%;
+          height: 40px;
+          div {
+            display: flex;
+            justify-content: end;
+            align-items: center;
+            button {
+              width: 30px;
+              height: 30px;
+              margin: 0;
+              display: inline;
+              padding: 0;
+            }
+          }
+        }
         textarea {
           height: 360px;
           border-color: #eee;

@@ -7,48 +7,11 @@ document.getElementById("cross").onclick = () => {
 
 // Displaying Note Creating Form
 document.getElementById("createNote").onclick = () => {
-  const noteDisplay = document.getElementById("noteDisplay");
-  noteDisplay.innerHTML = "";
-  // Creating Form For Writing Note
-  noteDisplay.appendChild(makeH1());
-  noteDisplay.appendChild(makeInput());
-  noteDisplay.appendChild(makeSelect());
-  noteDisplay.appendChild(makeEditorWindow());
-  noteDisplay.appendChild(makeButton());
+  displayNoteCreator();
 
   // Creating EventListener to Button For Submission
   document.getElementById("createNoteSave").onclick = () => {
-    const request = new XMLHttpRequest();
-    let title = document.getElementById("createNoteTitle").value;
-    let tag = document.getElementById("createNoteTag").value;
-    let content = document.getElementById("createNoteText").innerHTML;
-
-    if (title == "" || content == "") {
-      alert("Please Enter Both Title And Note Content");
-    }
-
-    request.open("POST", "/make_note");
-
-    request.onload = () => {
-      const data = JSON.parse(request.responseText);
-
-      if (data.success) {
-        showNoteInDisplay(data);
-
-        // Displaying in Notes List
-        const noteList = document.getElementById("notesList");
-        const div = newNoteInNoteList(data);
-        noteList.prepend(div);
-      }
-    };
-
-    const formData = new FormData();
-    formData.append("title", title);
-    formData.append("content", content);
-    formData.append("tag", tag);
-
-    request.send(formData);
-    return false;
+    makeOrUpdateNote("make_note");
   };
 };
 
@@ -129,7 +92,7 @@ function newNoteInNoteList(data) {
               >
             </div>
             <div class="toast-body">
-            ${data.content.slice(0, 60) + "..."}
+            ${data.content.slice(0, 60).replace(/(<([^>]+)>)/gi, "") + "..."}
             </div>
             <a href="javascript:showNote(${
               data.id
@@ -240,10 +203,58 @@ function makeEditor() {
     document.execCommand("strikethrough", false, null);
   });
 
+  const btnHeading = makeBtn();
+  btnHeading.innerHTML = `
+    <svg width="1em" height="1em" viewBox="0 0 16 16" class="bi bi-card-heading" fill="currentColor" xmlns="http://www.w3.org/2000/svg">
+    <path fill-rule="evenodd" d="M14.5 3h-13a.5.5 0 0 0-.5.5v9a.5.5 0 0 0 .5.5h13a.5.5 0 0 0 .5-.5v-9a.5.5 0 0 0-.5-.5zm-13-1A1.5 1.5 0 0 0 0 3.5v9A1.5 1.5 0 0 0 1.5 14h13a1.5 1.5 0 0 0 1.5-1.5v-9A1.5 1.5 0 0 0 14.5 2h-13z"/>
+    <path fill-rule="evenodd" d="M3 8.5a.5.5 0 0 1 .5-.5h9a.5.5 0 0 1 0 1h-9a.5.5 0 0 1-.5-.5zm0 2a.5.5 0 0 1 .5-.5h6a.5.5 0 0 1 0 1h-6a.5.5 0 0 1-.5-.5z"/>
+    <path d="M3 5.5a.5.5 0 0 1 .5-.5h9a.5.5 0 0 1 .5.5v1a.5.5 0 0 1-.5.5h-9a.5.5 0 0 1-.5-.5v-1z"/>
+  </svg>
+  `;
+  btnHeading.addEventListener("click", () => {
+    document.execCommand("heading", false, "H3");
+  });
+
+  const btnHRule = makeBtn();
+  btnHRule.innerHTML = `
+    <svg width="1em" height="1em" viewBox="0 0 16 16" class="bi bi-hr" fill="currentColor" xmlns="http://www.w3.org/2000/svg">
+    <path fill-rule="evenodd" d="M0 8a.5.5 0 0 1 .5-.5h15a.5.5 0 0 1 0 1H.5A.5.5 0 0 1 0 8z"/>
+    <path d="M4 3h8a1 1 0 0 1 1 1v2.5h1V4a2 2 0 0 0-2-2H4a2 2 0 0 0-2 2v2.5h1V4a1 1 0 0 1 1-1zM3 9.5H2V12a2 2 0 0 0 2 2h8a2 2 0 0 0 2-2V9.5h-1V12a1 1 0 0 1-1 1H4a1 1 0 0 1-1-1V9.5z"/>
+    </svg>
+  `;
+  btnHRule.addEventListener("click", () => {
+    document.execCommand("insertHorizontalRule", false, null);
+  });
+
+  const btnUList = makeBtn();
+  btnUList.innerHTML = `
+    <svg width="1em" height="1em" viewBox="0 0 16 16" class="bi bi-list-ul" fill="currentColor" xmlns="http://www.w3.org/2000/svg">
+    <path fill-rule="evenodd" d="M5 11.5a.5.5 0 0 1 .5-.5h9a.5.5 0 0 1 0 1h-9a.5.5 0 0 1-.5-.5zm0-4a.5.5 0 0 1 .5-.5h9a.5.5 0 0 1 0 1h-9a.5.5 0 0 1-.5-.5zm0-4a.5.5 0 0 1 .5-.5h9a.5.5 0 0 1 0 1h-9a.5.5 0 0 1-.5-.5zm-3 1a1 1 0 1 0 0-2 1 1 0 0 0 0 2zm0 4a1 1 0 1 0 0-2 1 1 0 0 0 0 2zm0 4a1 1 0 1 0 0-2 1 1 0 0 0 0 2z"/>
+    </svg>
+  `;
+  btnUList.addEventListener("click", () => {
+    document.execCommand("insertUnorderedList", false, null);
+  });
+
+  const btnOlIst = makeBtn();
+  btnOlIst.innerHTML = `
+    <svg width="1em" height="1em" viewBox="0 0 16 16" class="bi bi-list-ol" fill="currentColor" xmlns="http://www.w3.org/2000/svg">
+    <path fill-rule="evenodd" d="M5 11.5a.5.5 0 0 1 .5-.5h9a.5.5 0 0 1 0 1h-9a.5.5 0 0 1-.5-.5zm0-4a.5.5 0 0 1 .5-.5h9a.5.5 0 0 1 0 1h-9a.5.5 0 0 1-.5-.5zm0-4a.5.5 0 0 1 .5-.5h9a.5.5 0 0 1 0 1h-9a.5.5 0 0 1-.5-.5z"/>
+    <path d="M1.713 11.865v-.474H2c.217 0 .363-.137.363-.317 0-.185-.158-.31-.361-.31-.223 0-.367.152-.373.31h-.59c.016-.467.373-.787.986-.787.588-.002.954.291.957.703a.595.595 0 0 1-.492.594v.033a.615.615 0 0 1 .569.631c.003.533-.502.8-1.051.8-.656 0-1-.37-1.008-.794h.582c.008.178.186.306.422.309.254 0 .424-.145.422-.35-.002-.195-.155-.348-.414-.348h-.3zm-.004-4.699h-.604v-.035c0-.408.295-.844.958-.844.583 0 .96.326.96.756 0 .389-.257.617-.476.848l-.537.572v.03h1.054V9H1.143v-.395l.957-.99c.138-.142.293-.304.293-.508 0-.18-.147-.32-.342-.32a.33.33 0 0 0-.342.338v.041zM2.564 5h-.635V2.924h-.031l-.598.42v-.567l.629-.443h.635V5z"/>
+    </svg>
+  `;
+  btnOlIst.addEventListener("click", () => {
+    document.execCommand("insertOrderedList", false, null);
+  });
+
   fieldset.appendChild(btnBold);
   fieldset.appendChild(btnItalic);
   fieldset.appendChild(btnUnderline);
   fieldset.appendChild(btnStrikeThrough);
+  fieldset.appendChild(btnHeading);
+  fieldset.appendChild(btnHRule);
+  fieldset.appendChild(btnOlIst);
+  fieldset.appendChild(btnUList);
   return fieldset;
 }
 
@@ -258,7 +269,7 @@ function makeBtn() {
 }
 
 // Make Button For Note Creation Form
-function makeButton() {
+function makeSaveButton() {
   const btn = document.createElement("button");
   btn.id = "createNoteSave";
   btn.classList = "btn btn-outline-primary mt-3";
@@ -277,15 +288,74 @@ function showNoteInDisplay(data) {
   const small = document.createElement("small");
   small.innerHTML = data.timestamp + " - " + data.tag;
   small.style.color = "#aaa";
+  const menuBtns = document.createElement("div");
+  menuBtns.className = "menu-buttons";
+  menuBtns.appendChild(makeMenuBtnList(data));
   const p = document.createElement("p");
   p.innerHTML = data.content;
 
+  noteDisplay.appendChild(menuBtns);
   noteDisplay.appendChild(h1);
   noteDisplay.appendChild(small);
   noteDisplay.appendChild(p);
   return;
 }
+// Note Creating Form
+function displayNoteCreator() {
+  const noteDisplay = document.getElementById("noteDisplay");
+  noteDisplay.innerHTML = "";
+  // Creating Form For Writing Note
+  noteDisplay.appendChild(makeH1());
+  noteDisplay.appendChild(makeInput());
+  noteDisplay.appendChild(makeSelect());
+  noteDisplay.appendChild(makeEditorWindow());
+  noteDisplay.appendChild(makeSaveButton());
+}
 
+function makeMenuBtnList(data) {
+  const div = document.createElement("div");
+  const edit = makeMenuButton();
+  edit.innerHTML = `
+    <svg width="1em" height="1em" viewBox="0 0 16 16" class="bi bi-pencil" fill="currentColor" xmlns="http://www.w3.org/2000/svg">
+    <path fill-rule="evenodd" d="M11.293 1.293a1 1 0 0 1 1.414 0l2 2a1 1 0 0 1 0 1.414l-9 9a1 1 0 0 1-.39.242l-3 1a1 1 0 0 1-1.266-1.265l1-3a1 1 0 0 1 .242-.391l9-9zM12 2l2 2-9 9-3 1 1-3 9-9z"/>
+    <path fill-rule="evenodd" d="M12.146 6.354l-2.5-2.5.708-.708 2.5 2.5-.707.708zM3 10v.5a.5.5 0 0 0 .5.5H4v.5a.5.5 0 0 0 .5.5H5v.5a.5.5 0 0 0 .5.5H6v-1.5a.5.5 0 0 0-.5-.5H5v-.5a.5.5 0 0 0-.5-.5H3z"/>
+    </svg>
+  `;
+  edit.addEventListener("click", () => {
+    editNote(data);
+  });
+  const bookmark = makeMenuButton();
+  bookmark.id = "noteBookmark";
+  bookmark.innerHTML = `
+    <svg width="1em" height="1em" viewBox="0 0 16 16" class="bi bi-bookmark" fill="currentColor" xmlns="http://www.w3.org/2000/svg">
+    <path fill-rule="evenodd" d="M8 12l5 3V3a2 2 0 0 0-2-2H5a2 2 0 0 0-2 2v12l5-3zm-4 1.234l4-2.4 4 2.4V3a1 1 0 0 0-1-1H5a1 1 0 0 0-1 1v10.234z"/>
+    </svg>
+`;
+  bookmark.addEventListener("click", () => {
+    bookmarkNote(data.id);
+  });
+  const del = makeMenuButton();
+  del.innerHTML = `
+    <svg width="1em" height="1em" viewBox="0 0 16 16" class="bi bi-trash" fill="currentColor" xmlns="http://www.w3.org/2000/svg">
+    <path d="M5.5 5.5A.5.5 0 0 1 6 6v6a.5.5 0 0 1-1 0V6a.5.5 0 0 1 .5-.5zm2.5 0a.5.5 0 0 1 .5.5v6a.5.5 0 0 1-1 0V6a.5.5 0 0 1 .5-.5zm3 .5a.5.5 0 0 0-1 0v6a.5.5 0 0 0 1 0V6z"/>
+    <path fill-rule="evenodd" d="M14.5 3a1 1 0 0 1-1 1H13v9a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V4h-.5a1 1 0 0 1-1-1V2a1 1 0 0 1 1-1H6a1 1 0 0 1 1-1h2a1 1 0 0 1 1 1h3.5a1 1 0 0 1 1 1v1zM4.118 4L4 4.059V13a1 1 0 0 0 1 1h6a1 1 0 0 0 1-1V4.059L11.882 4H4.118zM2.5 3V2h11v1h-11z"/>
+    </svg>
+  `;
+  del.addEventListener("click", deleteNote);
+
+  div.appendChild(edit);
+  div.appendChild(bookmark);
+  div.appendChild(del);
+  return div;
+}
+
+// Make Buttons For Menu List
+function makeMenuButton() {
+  const btn = document.createElement("button");
+  btn.classList = "btn text-primary";
+
+  return btn;
+}
 // Animate Progress Bar
 function animateProgressBar() {
   const progressBar = document.getElementById("progressBar");
@@ -299,4 +369,74 @@ function animateProgressBar() {
 function resetProgressBar() {
   progressBar.style.width = 0;
   progressBar.setAttribute("aria-valuenow", 0);
+}
+
+function editNote(data) {
+  displayNoteCreator();
+
+  document.getElementById("createNoteTitle").value = data.title;
+  document.getElementById("createNoteTag").value = data.tag;
+  document.getElementById("createNoteText").innerHTML = data.content;
+
+  const update = document.getElementById("createNoteSave");
+  update.innerHTML = "Update";
+  update.addEventListener("click", () => {
+    makeOrUpdateNote("update_note");
+  });
+}
+
+function bookmarkNote(id) {
+  fetch(`/note/bookmark/${id}`)
+    .then((res) => res.json())
+    .then((data) => {
+      if (data.success) {
+        document.getElementById("noteBookmark").innerHTML = `
+          <svg width="1em" height="1em" viewBox="0 0 16 16" class="bi bi-bookmark-fill" fill="currentColor" xmlns="http://www.w3.org/2000/svg">
+          <path fill-rule="evenodd" d="M3 3a2 2 0 0 1 2-2h6a2 2 0 0 1 2 2v12l-5-3-5 3V3z"/>
+          </svg>`;
+      }
+    });
+}
+
+function deleteNote(id) {
+  fetch(`/note/delete/${id}`)
+    .then((res) => res.json())
+    .then((data) => {
+      if (data.success) {
+      }
+    });
+}
+
+function makeOrUpdateNote(value) {
+  const request = new XMLHttpRequest();
+  let title = document.getElementById("createNoteTitle").value;
+  let tag = document.getElementById("createNoteTag").value;
+  let content = document.getElementById("createNoteText").innerHTML;
+
+  if (title == "" || content == "") {
+    alert("Please Enter Both Title And Note Content");
+  }
+
+  request.open("POST", `/${value}`);
+
+  request.onload = () => {
+    const data = JSON.parse(request.responseText);
+
+    if (data.success) {
+      showNoteInDisplay(data);
+
+      // Displaying in Notes List
+      const noteList = document.getElementById("notesList");
+      const div = newNoteInNoteList(data);
+      noteList.prepend(div);
+    }
+  };
+
+  const formData = new FormData();
+  formData.append("title", title);
+  formData.append("content", content);
+  formData.append("tag", tag);
+
+  request.send(formData);
+  return false;
 }
