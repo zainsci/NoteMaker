@@ -213,7 +213,8 @@ def notes_tag(tag):
             "title": data.title,
             "content": data.content,
             "timestamp": data.timestamp.strftime("%d %b %Y %I:%M:%S %p"),
-            "id": data.id
+            "id": data.id,
+            "bookmark": data.bookmark
         }
         notes.append(note)
     data = notes[::-1]
@@ -234,6 +235,7 @@ def delete_note(id):
 def bookmark_note(id):
     note = db.query(Note).filter_by(id=id).first()
     note.bookmark = True
+    db.add(note)
     db.commit()
     return jsonify({"success": True})
 
