@@ -142,22 +142,24 @@ def make_note():
 
 @app.route("/update_note", methods=["POST"])
 def update_note():
-    newNote = Note()
-    newNote.title = request.form["title"]
-    newNote.content = Markup(request.form["content"])
-    newNote.tag = request.form["tag"]
-    newNote.timestamp = datetime.now()
-    newNote.user_id = session["user_id"]
-    db.add(newNote)
+    print(request.form["id"])
+    note = db.query(Note).filter_by(id=request.form['id']).first()
+
+    note.title = request.form["title"]
+    note.content = Markup(request.form["content"])
+    print(request.form["content"])
+    note.tag = request.form["tag"]
+    note.timestamp = datetime.now()
     db.commit()
 
     data = {
         "success": True,
-        "title": newNote.title,
-        "content": Markup(newNote.content),
-        "tag": newNote.tag,
-        "timestamp": newNote.timestamp.strftime("%d %b %Y %I:%M:%S %p"),
-        "id": newNote.id
+        "title": note.title,
+        "content": Markup(note.content),
+        "tag": note.tag,
+        "timestamp": note.timestamp.strftime("%d %b %Y %I:%M:%S %p"),
+        "id": request.form["id"],
+        "bookmark": note.bookmark
     }
     return jsonify(data)
 
@@ -193,7 +195,8 @@ def note(note_id):
                 "title": note.title,
                 "content": note.content,
                 "timestamp": note.timestamp.strftime("%d %b %Y %I:%M:%S %p"),
-                "tag": note.tag
+                "tag": note.tag,
+                "bookmark": note.bookmark
             }
             return jsonify(note)
         else:
@@ -205,29 +208,51 @@ def note(note_id):
 # For Notes Related To One Tag
 @app.route("/notes/<string:tag>")
 def notes_tag(tag):
-    dbData = db.query(Note).filter_by(tag=tag[3:]).all()
-    notes = []
-    for data in dbData:
-        note = {
-            "success": True,
-            "title": data.title,
-            "content": data.content,
-            "timestamp": data.timestamp.strftime("%d %b %Y %I:%M:%S %p"),
-            "id": data.id,
-            "bookmark": data.bookmark
-        }
-        notes.append(note)
-    data = notes[::-1]
+    if tag == "tagBookmarked":
+        dbData = db.query(Note).filter_by(bookmark=True).all()
+        notes = []
+        for data in dbData:
+            note = {
+                "success": True,
+                "title": data.title,
+                "content": data.content,
+                "timestamp": data.timestamp.strftime("%d %b %Y %I:%M:%S %p"),
+                "id": data.id,
+                "bookmark": data.bookmark
+            }
+            notes.append(note)
+        data = notes[::-1]
 
-    return jsonify(data)
+        return jsonify(data)
+
+    else:
+        dbData = db.query(Note).filter_by(tag=tag[3:]).all()
+        notes = []
+        for data in dbData:
+            note = {
+                "success": True,
+                "title": data.title,
+                "content": data.content,
+                "timestamp": data.timestamp.strftime("%d %b %Y %I:%M:%S %p"),
+                "id": data.id,
+                "bookmark": data.bookmark
+            }
+            notes.append(note)
+        data = notes[::-1]
+
+        return jsonify(data)
 
 
 # For Deleting Note
-@app.route("/delete/note/<int:id>")
+@app.route("/note/delete/<int:id>")
 def delete_note(id):
     note_to_del = db.query(Note).filter_by(id=id).first()
-    if note_to_del:
-        db.delete(note_to_del)
+
+    if note_to_del.user_id == session["user_id"]:
+        db.query(Note).filter_by(id=id).delete()
+        db.commit()
+
+        return jsonify({"success": True})
 
 
 # Bookmark Notes
@@ -235,7 +260,6 @@ def delete_note(id):
 def bookmark_note(id):
     note = db.query(Note).filter_by(id=id).first()
     note.bookmark = True
-    db.add(note)
     db.commit()
     return jsonify({"success": True})
 

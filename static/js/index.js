@@ -1,3 +1,5 @@
+import svgItalic from "./SVGs/italic.js";
+
 // Hidning All Forms
 document.getElementById("cross").onclick = () => {
   document.getElementById("auth-form").style.display = "none";
@@ -162,11 +164,7 @@ function makeEditor() {
   const fieldset = document.createElement("fieldset");
 
   const btnItalic = makeBtn();
-  btnItalic.innerHTML = `
-    <svg width="1em" height="1em" viewBox="0 0 16 16" class="bi bi-type-italic" fill="currentColor" xmlns="http://www.w3.org/2000/svg">
-    <path d="M7.991 11.674L9.53 4.455c.123-.595.246-.71 1.347-.807l.11-.52H7.211l-.11.52c1.06.096 1.128.212 1.005.807L6.57 11.674c-.123.595-.246.71-1.346.806l-.11.52h3.774l.11-.52c-1.06-.095-1.129-.211-1.006-.806z"/>
-    </svg>
-    `;
+  btnItalic.innerHTML = svgItalic;
   btnItalic.addEventListener("click", () => {
     document.execCommand("italic", false, null);
   });
@@ -326,11 +324,10 @@ function makeMenuBtnList(data) {
   });
   const bookmark = makeMenuButton();
   bookmark.id = "noteBookmark";
-  if (data.bookmark == true) {
-    bookmark.innerHTML = bookmarkFiill
-  }
-  else {
-  bookmark.innerHTML = bookmarkHollow
+  if (data.bookmark) {
+    bookmark.innerHTML = bookmarkFill;
+  } else {
+    bookmark.innerHTML = bookmarkHollow;
   }
   bookmark.addEventListener("click", () => {
     bookmarkNote(data.id);
@@ -342,7 +339,9 @@ function makeMenuBtnList(data) {
     <path fill-rule="evenodd" d="M14.5 3a1 1 0 0 1-1 1H13v9a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V4h-.5a1 1 0 0 1-1-1V2a1 1 0 0 1 1-1H6a1 1 0 0 1 1-1h2a1 1 0 0 1 1 1h3.5a1 1 0 0 1 1 1v1zM4.118 4L4 4.059V13a1 1 0 0 0 1 1h6a1 1 0 0 0 1-1V4.059L11.882 4H4.118zM2.5 3V2h11v1h-11z"/>
     </svg>
   `;
-  del.addEventListener("click", deleteNote);
+  del.addEventListener("click", () => {
+    deleteNote(data.id);
+  });
 
   div.appendChild(edit);
   div.appendChild(bookmark);
@@ -357,6 +356,7 @@ function makeMenuButton() {
 
   return btn;
 }
+
 // Animate Progress Bar
 function animateProgressBar() {
   const progressBar = document.getElementById("progressBar");
@@ -382,19 +382,19 @@ function editNote(data) {
   const update = document.getElementById("createNoteSave");
   update.innerHTML = "Update";
   update.addEventListener("click", () => {
-    makeOrUpdateNote("update_note");
+    makeOrUpdateNote("update_note", data.id);
   });
 }
 
+// For Bookmarking Note
 function bookmarkNote(id) {
   fetch(`/note/bookmark/${id}`)
     .then((res) => res.json())
     .then((data) => {
       if (data.success) {
-        document.getElementById("noteBookmark").innerHTML = `
-          <svg width="1em" height="1em" viewBox="0 0 16 16" class="bi bi-bookmark-fill" fill="currentColor" xmlns="http://www.w3.org/2000/svg">
-          <path fill-rule="evenodd" d="M3 3a2 2 0 0 1 2-2h6a2 2 0 0 1 2 2v12l-5-3-5 3V3z"/>
-          </svg>`;
+        document.getElementById("noteBookmark").innerHTML = bookmarkFill;
+      } else {
+        document.getElementById("noteBookmark").innerHTML = bookmarkHollow;
       }
     });
 }
@@ -404,15 +404,16 @@ function deleteNote(id) {
     .then((res) => res.json())
     .then((data) => {
       if (data.success) {
+        window.location.reload();
       }
     });
 }
 
-function makeOrUpdateNote(value) {
+function makeOrUpdateNote(value, id) {
   const request = new XMLHttpRequest();
-  let title = document.getElementById("createNoteTitle").value;
-  let tag = document.getElementById("createNoteTag").value;
-  let content = document.getElementById("createNoteText").innerHTML;
+  let title = document.getElementById("createNoteTitle");
+  let tag = document.getElementById("createNoteTag");
+  let content = document.getElementById("createNoteText");
 
   if (title == "" || content == "") {
     alert("Please Enter Both Title And Note Content");
@@ -427,27 +428,31 @@ function makeOrUpdateNote(value) {
       showNoteInDisplay(data);
 
       // Displaying in Notes List
-      const noteList = document.getElementById("notesList");
-      const div = newNoteInNoteList(data);
-      noteList.prepend(div);
+      if (value != "update_note") {
+        const noteList = document.getElementById("notesList");
+        const div = newNoteInNoteList(data);
+        noteList.prepend(div);
+      }
     }
   };
 
   const formData = new FormData();
-  formData.append("title", title);
-  formData.append("content", content);
-  formData.append("tag", tag);
+  formData.append("title", title.value);
+  formData.append("content", content.innerHTML);
+  formData.append("tag", tag.value);
+  if (value == "update_note") {
+    formData.append("id", id);
+  }
 
   request.send(formData);
   return false;
 }
 
-
 const bookmarkHollow = `
   <svg width="1em" height="1em" viewBox="0 0 16 16" class="bi bi-bookmark" fill="currentColor" xmlns="http://www.w3.org/2000/svg">
   <path fill-rule="evenodd" d="M8 12l5 3V3a2 2 0 0 0-2-2H5a2 2 0 0 0-2 2v12l5-3zm-4 1.234l4-2.4 4 2.4V3a1 1 0 0 0-1-1H5a1 1 0 0 0-1 1v10.234z"/>
   </svg>`;
-const bookmarkFiill = `
+const bookmarkFill = `
   <svg width="1em" height="1em" viewBox="0 0 16 16" class="bi bi-bookmark-fill" fill="currentColor" xmlns="http://www.w3.org/2000/svg">
   <path fill-rule="evenodd" d="M3 3a2 2 0 0 1 2-2h6a2 2 0 0 1 2 2v12l-5-3-5 3V3z"/>
   </svg>`;
