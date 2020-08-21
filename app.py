@@ -259,7 +259,7 @@ def delete_note(id):
 @app.route("/note/bookmark/<int:id>")
 def bookmark_note(id):
     note = db.query(Note).filter_by(id=id).first()
-    note.bookmark = True
+    note.bookmark = not (note.bookmark)
     db.commit()
     return jsonify({"success": True})
 
