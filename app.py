@@ -1,4 +1,13 @@
-from flask import Flask, render_template, url_for, request, redirect, jsonify, session, flash
+from flask import (
+    Flask,
+    render_template,
+    url_for,
+    request,
+    redirect,
+    jsonify,
+    session,
+    flash,
+)
 from jinja2 import utils
 from markupsafe import Markup
 from models import Session, db, User, Note
@@ -33,8 +42,8 @@ def signin():
 
     # If User tries to signin
     if request.method == "POST":
-        username = request.form['signinUsername']
-        password = request.form['signinPassword']
+        username = request.form["signinUsername"]
+        password = request.form["signinPassword"]
 
         # If Username is not provided
         if not username:
@@ -52,13 +61,13 @@ def signin():
         # If Databse returned User object
         if user:
             # Hashing Password for password checking
-            hash = hashlib.md5(password.encode('utf-8')).hexdigest()
+            hash = hashlib.md5(password.encode("utf-8")).hexdigest()
 
             # matching password from databse and the user entered
             if hash == user.hash:
-                session['username'] = user.username
-                session['user_id'] = user.id
-                return redirect(url_for('index'))
+                session["username"] = user.username
+                session["user_id"] = user.id
+                return redirect(url_for("index"))
             # if incorrect password
             else:
                 flash("Invalid Username or Password")
@@ -79,10 +88,10 @@ def signup():
     # if user tries to signup
     if request.method == "POST":
         # getting username and other
-        username = request.form['signupUsername']
-        email = request.form['signupEmail']
-        password = request.form['signupPassword']
-        conf_password = request.form['conf-password']
+        username = request.form["signupUsername"]
+        email = request.form["signupEmail"]
+        password = request.form["signupPassword"]
+        conf_password = request.form["conf-password"]
 
         # if username is not provided
         if not username:
@@ -106,12 +115,12 @@ def signup():
                 user = User()
                 user.username = username
                 user.email = email
-                user.hash = hashlib.md5((password).encode('utf-8')).hexdigest()
+                user.hash = hashlib.md5((password).encode("utf-8")).hexdigest()
                 db.add(user)
                 db.commit()
                 # creating user session and logging in
-                session['username'] = user.username
-                session['user_id'] = user.id
+                session["username"] = user.username
+                session["user_id"] = user.id
                 flash(f"Account Created With Username {username}")
                 return redirect(url_for("index"))
     else:
@@ -120,22 +129,22 @@ def signup():
 
 @app.route("/make_note", methods=["POST"])
 def make_note():
-    newNote = Note()
-    newNote.title = request.form["title"]
-    newNote.content = Markup(request.form["content"])
-    newNote.tag = request.form["tag"]
-    newNote.timestamp = datetime.now()
-    newNote.user_id = session["user_id"]
-    db.add(newNote)
+    new_note = Note()
+    new_note.title = request.form["title"]
+    new_note.content = Markup(request.form["content"])
+    new_note.tag = request.form["tag"]
+    new_note.timestamp = datetime.now()
+    new_note.user_id = session["user_id"]
+    db.add(new_note)
     db.commit()
 
     data = {
         "success": True,
-        "title": newNote.title,
-        "content": Markup(newNote.content),
-        "tag": newNote.tag,
-        "timestamp": newNote.timestamp.strftime("%d %b %Y %I:%M:%S %p"),
-        "id": newNote.id
+        "title": new_note.title,
+        "content": Markup(new_note.content),
+        "tag": new_note.tag,
+        "timestamp": new_note.timestamp.strftime("%d %b %Y %I:%M:%S %p"),
+        "id": new_note.id,
     }
     return jsonify(data)
 
@@ -143,7 +152,7 @@ def make_note():
 @app.route("/update_note", methods=["POST"])
 def update_note():
     print(request.form["id"])
-    note = db.query(Note).filter_by(id=request.form['id']).first()
+    note = db.query(Note).filter_by(id=request.form["id"]).first()
 
     note.title = request.form["title"]
     note.content = Markup(request.form["content"])
@@ -159,7 +168,7 @@ def update_note():
         "tag": note.tag,
         "timestamp": note.timestamp.strftime("%d %b %Y %I:%M:%S %p"),
         "id": request.form["id"],
-        "bookmark": note.bookmark
+        "bookmark": note.bookmark,
     }
     return jsonify(data)
 
@@ -174,7 +183,7 @@ def all_notes():
             "title": data.title,
             "content": data.content,
             "timestamp": data.timestamp.strftime("%d %b %Y %I:%M:%S %p"),
-            "id": data.id
+            "id": data.id,
         }
         notes.append(note)
     data = notes[::-1]
@@ -196,7 +205,7 @@ def note(note_id):
                 "content": note.content,
                 "timestamp": note.timestamp.strftime("%d %b %Y %I:%M:%S %p"),
                 "tag": note.tag,
-                "bookmark": note.bookmark
+                "bookmark": note.bookmark,
             }
             return jsonify(note)
         else:
@@ -209,16 +218,16 @@ def note(note_id):
 @app.route("/notes/<string:tag>")
 def notes_tag(tag):
     if tag == "tagBookmarked":
-        dbData = db.query(Note).filter_by(bookmark=True).all()
+        db_data = db.query(Note).filter_by(bookmark=True).all()
         notes = []
-        for data in dbData:
+        for data in db_data:
             note = {
                 "success": True,
                 "title": data.title,
                 "content": data.content,
                 "timestamp": data.timestamp.strftime("%d %b %Y %I:%M:%S %p"),
                 "id": data.id,
-                "bookmark": data.bookmark
+                "bookmark": data.bookmark,
             }
             notes.append(note)
         data = notes[::-1]
@@ -226,16 +235,16 @@ def notes_tag(tag):
         return jsonify(data)
 
     else:
-        dbData = db.query(Note).filter_by(tag=tag[3:]).all()
+        db_data = db.query(Note).filter_by(tag=tag[3:]).all()
         notes = []
-        for data in dbData:
+        for data in db_data:
             note = {
                 "success": True,
                 "title": data.title,
                 "content": data.content,
                 "timestamp": data.timestamp.strftime("%d %b %Y %I:%M:%S %p"),
                 "id": data.id,
-                "bookmark": data.bookmark
+                "bookmark": data.bookmark,
             }
             notes.append(note)
         data = notes[::-1]
