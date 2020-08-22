@@ -14,18 +14,13 @@ export default function newNoteInNoteList(data) {
               >
             </div>
             <div class="toast-body">
-            ${data.content.slice(0, 60).replace(/(<([^>]+)>)/gi, "") + "..."}
+            ${data.content.replace(/(<([^>]+)>)/gi, "").slice(0, 60) + "..."}
             </div>
             <a href="note/${data.id}" id="${
     data.id
   }" class="stretched-link note"></a>
         `;
   div.innerHTML = newNote;
-
-  div.addEventListener("click", (e) => {
-    e.preventDefault();
-    showNote(data.id);
-  });
 
   return div;
 }
